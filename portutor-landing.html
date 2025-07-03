@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PorTutor - Personalized Language Lessons</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --purple: #7B68EE;
+            --dark-purple: #6B5DD3;
+            --grey: #6C757D;
+            --light-grey: #F8F9FA;
+            --white: #FFFFFF;
+            --black: #2C3E50;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--light-grey) 0%, var(--white) 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: var(--black);
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, var(--purple), var(--dark-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .tagline {
+            font-size: 1.5rem;
+            color: var(--grey);
+            margin-bottom: 3rem;
+            font-weight: 300;
+            animation: fadeInUp 1s ease-out 0.3s both;
+        }
+
+        .languages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+            animation: fadeIn 1s ease-out 0.6s both;
+        }
+
+        .language-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .language-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--purple), var(--dark-purple));
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .language-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(123, 104, 238, 0.2);
+        }
+
+        .language-card:hover::before {
+            transform: translateX(0);
+        }
+
+        .language-label {
+            font-size: 1.2rem;
+            color: var(--purple);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .flag {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .language-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--black);
+            margin-bottom: 0.5rem;
+        }
+
+        .language-level {
+            color: var(--grey);
+            font-size: 0.9rem;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--white);
+            border-radius: 20px;
+            padding: 3rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            animation: slideIn 0.3s ease;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .modal-title {
+            font-size: 2rem;
+            color: var(--purple);
+            font-weight: 700;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: var(--grey);
+            transition: color 0.3s ease;
+            padding: 0;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            color: var(--black);
+        }
+
+        .contact-info {
+            text-align: left;
+        }
+
+        .contact-item {
+            margin-bottom: 2rem;
+        }
+
+        .contact-label {
+            color: var(--grey);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .contact-link {
+            display: inline-flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            background: linear-gradient(45deg, var(--purple), var(--dark-purple));
+            color: var(--white);
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            width: 100%;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .contact-link:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(123, 104, 238, 0.3);
+        }
+
+        .contact-icon {
+            margin-right: 0.5rem;
+        }
+
+        .email-info {
+            margin-top: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--grey);
+            text-align: center;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -45%);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 2rem;
+            }
+            
+            .tagline {
+                font-size: 1.2rem;
+            }
+            
+            .languages-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="logo">PorTutor</h1>
+        <p class="tagline">Welcome to Personalized Language Learning</p>
+        
+        <div class="languages-grid">
+            <div class="language-card" onclick="openModal('Portuguese')">
+                <p class="language-label">Portuguese</p>
+                <div class="flag">🇧🇷</div>
+                <p class="language-level">Native Speaker</p>
+            </div>
+            
+            <div class="language-card" onclick="openModal('English')">
+                <p class="language-label">English</p>
+                <div class="flag">🇬🇧</div>
+                <p class="language-level">Professional Level</p>
+            </div>
+            
+            <div class="language-card" onclick="openModal('Spanish')">
+                <p class="language-label">Spanish</p>
+                <div class="flag">🇪🇸</div>
+                <p class="language-level">Professional Level</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Modal -->
+    <div id="contactModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Get Started</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            
+            <div class="contact-info">
+                <p style="margin-bottom: 2rem; color: var(--grey);">
+                    Hi! I'm Antonio, and I'm excited to help you learn <span id="selectedLanguage"></span>. 
+                    Contact me to schedule your personalized lesson!
+                </p>
+                
+                <div class="contact-item">
+                    <p class="contact-label">Email</p>
+                    <button onclick="copyEmail()" class="contact-link" style="border: none; width: 100%;">
+                        <span class="contact-icon">📋</span>
+                        <span id="emailButtonText">Copy Email Address</span>
+                    </button>
+                    <p class="email-info" style="text-align: center; margin-top: 10px;">tonipereiradospassos@hotmail.com</p>
+                </div>
+                
+                <div class="contact-item">
+                    <p class="contact-label">WhatsApp</p>
+                    <a href="https://wa.me/5548991029808" 
+                       class="contact-link" 
+                       target="_blank">
+                        <span class="contact-icon">💬</span>
+                        Message on WhatsApp
+                    </a>
+                    <p class="email-info">+55 48 99102-9808</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function copyEmail() {
+            const email = 'tonipereiradospassos@hotmail.com';
+            navigator.clipboard.writeText(email).then(function() {
+                // Change button text temporarily
+                document.getElementById('emailButtonText').textContent = 'Email Copied!';
+                setTimeout(function() {
+                    document.getElementById('emailButtonText').textContent = 'Copy Email Address';
+                }, 2000);
+            }).catch(function(err) {
+                // Fallback for older browsers
+                alert('Email: ' + email);
+            });
+        }
+
+        function openModal(language) {
+            document.getElementById('contactModal').style.display = 'block';
+            document.getElementById('selectedLanguage').textContent = language;
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('contactModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('contactModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
